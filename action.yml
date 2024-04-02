@@ -580,9 +580,9 @@ runs:
 
     - name: Codesign macOS pkg
       if: ${{ startsWith(inputs.target, 'macos') }}
-      secrets:
-        MACOS_CERTIFICATE: "${{ secrets.MACOS_CERTIFICATE }}"
-        MACOS_CERTIFICATE_PWD: "${{ secrets.MACOS_CERTIFICATE_PW }}"
+      env:
+        MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+        MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PW }}
         KEYCHAINPWD: temporarykeychainpassword
       shell: bash
       run: |
