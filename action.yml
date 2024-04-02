@@ -578,6 +578,22 @@ runs:
           cp *-macOS.pkg ${{ env.ARTIFACT_BASENAME }}.pkg
         fi
 
+    - name: Codesign macOS pkg
+      if: ${{ startsWith(inputs.target, 'macos') }}
+      env:
+        MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+        MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PW }}
+        KEYCHAINPWD: temporarykeychainpassword
+      shell: bash
+      run: |
+        security create-keychain -p "$KEYCHAINPWD" build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p "$KEYCHAINPWD" build.keychain
+        echo -n $MACOS_CERTIFICATE | base64 --decode -o certificate.p12
+        security import certificate.p12 -P $MACOS_CERTIFICATE_PWD -A -t cert -f pkcs12 -k build.keychain -T /usr/bin/codesign
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAINPWD" build.keychain
+        find . -iname '*.pkg' -exec /usr/bin/codesign --force -s "Developer ID Application" {} -v \;
+
     # upload artifacts (action)
     - name: Upload artifacts (Linux)
       if: ${{ startsWith(inputs.target, 'linux') }}
