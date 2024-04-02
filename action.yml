@@ -2,17 +2,17 @@ name: 'DPF CMake builder action'
 description: 'Builds DPF based plugins that use CMake as build system'
 author: 'DISTRHO'
 
-secrets:
-  MACOS_CERTIFICATE:
-    required: true
-  MACOS_CERTIFICATE_PW:
-    required: true
-
 inputs:
   target:
     description: 'Target OS'
     required: true
     default: 'linux'
+  macOS_certificate:
+    description: 'macOS code signing certificate'
+    required: true
+  macOS_certificate_pw:
+    description: 'macOS code signing certificate password'
+    required: true
   debug:
     description: 'Build in debug mode'
     required: false
@@ -587,8 +587,8 @@ runs:
     - name: Codesign macOS pkg
       if: ${{ startsWith(inputs.target, 'macos') }}
       env:
-        MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
-        MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PW }}
+        MACOS_CERTIFICATE: ${{ inputs.macOS_certificate }}
+        MACOS_CERTIFICATE_PWD: ${{ inputs.macOS_certificate_pw }}
         KEYCHAINPWD: temporarykeychainpassword
       shell: bash
       run: |
