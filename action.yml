@@ -9,10 +9,10 @@ inputs:
     default: 'linux'
   macOS_certificate:
     description: 'macOS code signing certificate'
-    required: true
+    required: false
   macOS_certificate_pw:
     description: 'macOS code signing certificate password'
-    required: true
+    required: false
   debug:
     description: 'Build in debug mode'
     required: false
@@ -584,22 +584,6 @@ runs:
           cp *-macOS.pkg ${{ env.ARTIFACT_BASENAME }}.pkg
         fi
 
-    - name: Codesign macOS pkg
-      if: ${{ startsWith(inputs.target, 'macos') }}
-      env:
-        MACOS_CERTIFICATE: ${{ inputs.macOS_certificate }}
-        MACOS_CERTIFICATE_PWD: ${{ inputs.macOS_certificate_pw }}
-        KEYCHAINPWD: temporarykeychainpassword
-      shell: bash
-      run: |
-        security create-keychain -p "$KEYCHAINPWD" build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p "$KEYCHAINPWD" build.keychain
-        echo -n $MACOS_CERTIFICATE | base64 --decode -o certificate.p12
-        security import certificate.p12 -P $MACOS_CERTIFICATE_PWD -A -t cert -f pkcs12 -k build.keychain -T /usr/bin/codesign
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAINPWD" build.keychain
-        find . -iname '*.pkg' -exec /usr/bin/codesign --force -s "Developer ID Application" {} -v \;
-
     # upload artifacts (action)
     - name: Upload artifacts (Linux)
       if: ${{ startsWith(inputs.target, 'linux') }}
@@ -645,6 +629,21 @@ runs:
           mv ${{ env.ARTIFACT_BASENAME }}.pkg ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg
           echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.pkg >> $GITHUB_ENV
         fi
+    - name: Codesign macOS release pkg
+      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
+      env:
+        MACOS_CERTIFICATE: ${{ inputs.macOS_certificate }}
+        MACOS_CERTIFICATE_PWD: ${{ inputs.macOS_certificate_pw }}
+        KEYCHAINPWD: temporarykeychainpassword
+      shell: bash
+      run: |
+        security create-keychain -p "$KEYCHAINPWD" build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p "$KEYCHAINPWD" build.keychain
+        echo -n $MACOS_CERTIFICATE | base64 --decode -o certificate.p12
+        security import certificate.p12 -P $MACOS_CERTIFICATE_PWD -A -t cert -f pkcs12 -k build.keychain -T /usr/bin/codesign
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAINPWD" build.keychain
+        find . -iname '*.pkg' -exec /usr/bin/codesign --force -s "Developer ID Application" {} -v \;
     - name: Create release archive (Windows)
       if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
       shell: bash
