@@ -2,6 +2,12 @@ name: 'DPF CMake builder action'
 description: 'Builds DPF based plugins that use CMake as build system'
 author: 'DISTRHO'
 
+secrets:
+  MACOS_CERTIFICATE:
+    required: true
+  MACOS_CERTIFICATE_PW:
+    required: true
+
 inputs:
   target:
     description: 'Target OS'
