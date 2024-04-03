@@ -638,12 +638,12 @@ runs:
         KEYCHAINPWD: temporarykeychainpassword
       shell: bash
       run: |
-        security create-keychain -p "$KEYCHAINPWD" build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p "$KEYCHAINPWD" build.keychain
+        security create-keychain -p "$KEYCHAINPWD" build.keychain2
+        security default-keychain -s build.keychain2
+        security unlock-keychain -p "$KEYCHAINPWD" build.keychain2
         echo -n $MACOS_CERTIFICATE | base64 --decode -o certificate.p12
-        security import certificate.p12 -P $MACOS_CERTIFICATE_PWD -A -t cert -f pkcs12 -k build.keychain -T /usr/bin/codesign
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAINPWD" build.keychain
+        security import certificate.p12 -P $MACOS_CERTIFICATE_PWD -A -t cert -f pkcs12 -k build.keychain2 -T /usr/bin/codesign
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAINPWD" build.keychain2
         find . -iname '*.dmg' -exec /usr/bin/codesign --force -s "Developer ID Application" {} -v \;
     - name: Create release archive (Windows)
       if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
