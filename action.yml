@@ -13,6 +13,12 @@ inputs:
   macOS_certificate_pw:
     description: 'macOS code signing certificate password'
     required: false
+  macOS_notarization_username:
+    description: 'macOS notarization username (app store connect username)'
+    required: false
+  macOS_notarization_password:
+    description: 'macOS notarization password'
+    required: false
   debug:
     description: 'Build in debug mode'
     required: false
@@ -667,6 +673,22 @@ runs:
             .
         mv ../${{ env.RELEASE_BASENAME }}-src.tar.xz .
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-src.tar.xz >> $GITHUB_ENV
+
+    # notarize macOS archive
+    - name: Notarize release archive
+      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
+      uses: BoundfoxStudios/action-xcode-notarize@v1
+      with:
+        product-path: ${{ env.RELEASE_FILENAME }}
+        appstore-connect-username: ${{ inputs.macOS_notarization_username }}
+        appstore-connect-password: ${{ inputs.macOS_notarization_password }}
+
+    # staple macOS archive
+    - name: Staple release archive
+      if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
+      uses: BoundfoxStudios/action-xcode-staple@v1
+      with:
+        product-path: ${{ env.RELEASE_FILENAME }}
 
     # upload release archive
     - uses: softprops/action-gh-release@v1
