@@ -677,6 +677,7 @@ runs:
     # notarize macOS archive
     - name: Create a notarization request
       if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
+      shell: bash
       env:
         APPLE_ID: ${{ inputs.macOS_notarization_username }}
         APPLE_PASSWORD: ${{ inputs.macOS_notarization_password }}
@@ -690,6 +691,7 @@ runs:
     # check macOS notarization status
     - name: Check notarization status
       if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
+      shell: bash
       env:
         APPLE_ID: ${{ inputs.macOS_notarization_username }}
         APPLE_PASSWORD: ${{ inputs.macOS_notarization_password }}
@@ -701,6 +703,7 @@ runs:
     # staple macOS archive
     - name: Staple the notarization ticket
       if: ${{ startsWith(inputs.target, 'macos') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
+      shell: bash
       run: xcrun stapler staple /path/to/MyApp.app
 
     # upload release archive
