@@ -607,11 +607,7 @@ runs:
         echo -n $MACOS_CERTIFICATE | base64 --decode -o certificate.p12
         security import certificate.p12 -P $MACOS_CERTIFICATE_PWD -A -t cert -f pkcs12 -k build.keychain -T /usr/bin/codesign
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAINPWD" build.keychain
-        find . -iname '*.component' -exec /usr/bin/codesign --force -s "Developer ID Application" {} -v \;
-        find . -iname '*.clap' -exec /usr/bin/codesign --timestamp --force -s "Developer ID Application" {} -v \;
-        find . -iname '*.lv2' -exec /usr/bin/codesign --timestamp --force -s "Developer ID Application" {} -v \;
-        find . -iname '*.vst' -exec /usr/bin/codesign --timestamp --force -s "Developer ID Application" {} -v \;
-        find . -iname '*.vst3' -exec /usr/bin/codesign --timestamp --force -s "Developer ID Application" {} -v \;
+        find . -iname '*' -exec /usr/bin/codesign --force -s "Developer ID Application" {} -v \;
 
     # upload artifacts (action)
     - name: Upload artifacts (Linux)
