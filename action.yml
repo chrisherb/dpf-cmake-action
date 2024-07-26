@@ -649,7 +649,7 @@ runs:
       shell: bash
       run: |
         mv bin ${{ env.RELEASE_BASENAME }}
-        hdiutil create ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.dmg -srcfolder ${{ env.RELEASE_BASENAME }} -volname ${{ env.ARTIFACT_BASENAME }} -fs HFS+ -ov
+        hdiutil create ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.dmg -srcfolder ${{ env.RELEASE_BASENAME }} -volname ${{ env.RELEASE_BASENAME }} -fs HFS+ -ov
         echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.dmg >> $GITHUB_ENV
     - name: Create release archive (Windows)
       if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
