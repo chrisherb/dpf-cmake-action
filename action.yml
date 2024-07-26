@@ -593,6 +593,7 @@ runs:
         echo "ARTIFACT_BASENAME=${{ github.event.repository.name }}-${{ inputs.target }}${TARGET_SUFFIX}-${{ github.event.pull_request.number || env.SHA8 }}${{ inputs.suffix }}" >> $GITHUB_ENV
         echo "RELEASE_BASENAME=${{ github.event.repository.name }}-$(echo ${{ github.ref_name }} | sed 's|/|-|g')${{ inputs.suffix }}" >> $GITHUB_ENV
 
+    # codesign macOS artifacts
     - name: Codesign macOS artifacts
       if: ${{ startsWith(inputs.target, 'macos') }}
       env:
@@ -648,8 +649,8 @@ runs:
       shell: bash
       run: |
         mv bin ${{ env.RELEASE_BASENAME }}
-        zip -r -9 ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.zip ${{ env.RELEASE_BASENAME }}/*
-        echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.zip >> $GITHUB_ENV
+        hdiutil create ${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.dmg -srcfolder ${{ env.RELEASE_BASENAME }} -volname ${{ env.ARTIFACT_BASENAME }} -fs HFS+ -ov
+        echo RELEASE_FILENAME=${{ env.RELEASE_BASENAME }}-${{ inputs.target }}.dmg >> $GITHUB_ENV
     - name: Create release archive (Windows)
       if: ${{ startsWith(inputs.target, 'win') && startsWith(github.ref, 'refs/tags/') && inputs.release == 'true' && inputs.debug == 'false' }}
       shell: bash
