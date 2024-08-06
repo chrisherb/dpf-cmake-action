@@ -639,20 +639,34 @@ runs:
     - name: Sort Artifacts
       shell: bash
       run: |
-        cd bin
-        declare -A prefix_map
+        cd bin/
+        prefixes=()
+        items=()
         for item in *; do
-          prefix=$(echo "$item" | sed 's/[.-].*//')
-          if [ -n "$prefix" ]; then
-            prefix_map["$prefix"]+="$item "
-          fi
+            prefix=$(echo "$item" | sed 's/[.-].*//')
+            if [ -n "$prefix" ]; then
+                found=false
+                for i in "${!prefixes[@]}"; do
+                    if [ "${prefixes[$i]}" == "$prefix" ]; then
+                        items[$i]+="$item "
+                        found=true
+                        break
+                    fi
+                done
+                if [ "$found" = false ]; then
+                    prefixes+=("$prefix")
+                    items+=("$item ")
+                fi
+            fi
         done
-        for prefix in "${!prefix_map[@]}"; do
-          mkdir -p "$prefix-tmp"
-          for item in ${prefix_map[$prefix]}; do
-            mv "$item" "$prefix-tmp"
-          done
-          mv "$prefix-tmp" "$prefix"
+        for i in "${!prefixes[@]}"; do
+            prefix=${prefixes[$i]}
+            stuff=${items[$i]}
+            mkdir -p "$prefix-tmp"
+            for item in ${stuff[@]}; do
+                mv "$item" "$prefix-tmp"
+            done
+            mv "$prefix-tmp" "$prefix"
         done
         cd ../
 
