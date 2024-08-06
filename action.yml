@@ -723,7 +723,7 @@ runs:
         TEAM_ID: ${{ inputs.macOS_notarization_teamid }}
       run: |
         for file in bin/*; do
-          xcrun notarytool submit "$file-$(echo ${{ github.ref_name }}).dmg" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" --team-id "$TEAM_ID" --wait
+          xcrun notarytool submit "$file" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" --team-id "$TEAM_ID" --wait
         done
 
     # staple macOS archives
@@ -732,7 +732,7 @@ runs:
       shell: bash
       run: |
         for file in bin/*; do
-          xcrun stapler staple "$file-$(echo ${{ github.ref_name }}).dmg"
+          xcrun stapler staple "$file"
         done
 
     # upload release archives
