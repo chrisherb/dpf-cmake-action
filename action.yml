@@ -663,7 +663,7 @@ runs:
       run: |
         for folder in bin/*; do
           folder_name=$(basename $folder)
-          tar -czf "$folder-$(echo ${{ github.ref_name }}.tar.gz" -C "bin" "$folder_name"
+          tar -czf "$folder-$(echo ${{ github.ref_name }}).tar.gz" -C "bin" "$folder_name"
           rm -rf $folder_name
         done
     - name: Create release archive (macOS)
@@ -672,7 +672,7 @@ runs:
       run: |
         for folder in bin/*; do
           folder_name=$(basename $folder)
-          hdiutil create "$folder-$(echo ${{ github.ref_name }}.dmg" -srcfolder "$folder_name" -volname "folder_name" -fs HFS+ -ov
+          hdiutil create "$folder-$(echo ${{ github.ref_name }}).dmg" -srcfolder "$folder" -volname "$folder_name" -fs HFS+ -ov
           rm -rf $folder
         done
     - name: Create release archive (Windows)
@@ -682,7 +682,7 @@ runs:
         for folder in bin/*; do
           cd $folder
           folder_name=$(basename $folder)
-          zip -r -9 "../$folder_name-$(echo ${{ github.ref_name }}.zip" "."
+          zip -r -9 "../$folder_name-$(echo ${{ github.ref_name }}).zip" "."
           cd -
           rm -rf $folder
         done
@@ -709,7 +709,7 @@ runs:
         TEAM_ID: ${{ inputs.macOS_notarization_teamid }}
       run: |
         for file in bin/*; do
-          xcrun notarytool submit "$file-$(echo ${{ github.ref_name }}.dmg" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" --team-id "$TEAM_ID" --wait
+          xcrun notarytool submit "$file-$(echo ${{ github.ref_name }}).dmg" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" --team-id "$TEAM_ID" --wait
         done
 
     # staple macOS archives
@@ -718,7 +718,7 @@ runs:
       shell: bash
       run: |
         for file in bin/*; do
-          xcrun stapler staple "$file-$(echo ${{ github.ref_name }}.dmg"
+          xcrun stapler staple "$file-$(echo ${{ github.ref_name }}).dmg"
         done
 
     # upload release archives
