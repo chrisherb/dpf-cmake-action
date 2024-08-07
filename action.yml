@@ -677,7 +677,7 @@ runs:
       run: |
         for folder in bin/*; do
           folder_name=$(basename $folder)
-          tar -czf "$folder-$(echo ${{ github.ref_name }}).tar.gz" -C "bin" "$folder_name"
+          tar -czf "$folder-${{ github.ref_name }}-${{ inputs.target }}.tar.gz" -C "bin" "$folder_name"
           rm -rf $folder_name
         done
     - name: Create release archive (macOS)
@@ -686,7 +686,7 @@ runs:
       run: |
         for folder in bin/*; do
           folder_name=$(basename $folder)
-          hdiutil create "$folder-$(echo ${{ github.ref_name }}).dmg" -srcfolder "$folder" -volname "$folder_name" -fs HFS+ -ov
+          hdiutil create "$folder-${{ github.ref_name }}-${{ inputs.target }}.dmg" -srcfolder "$folder" -volname "$folder_name" -fs HFS+ -ov
           rm -rf $folder
         done
     - name: Create release archive (Windows)
@@ -696,7 +696,7 @@ runs:
         for folder in bin/*; do
           cd $folder
           folder_name=$(basename $folder)
-          zip -r -9 "../$folder_name-$(echo ${{ github.ref_name }}).zip" "."
+          zip -r -9 "../$folder_name-${{ github.ref_name }}-${{ inputs.target }}.zip" "."
           cd -
           rm -rf $folder
         done
