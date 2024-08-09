@@ -608,6 +608,7 @@ runs:
         echo -n $MACOS_CERTIFICATE | base64 --decode -o certificate.p12
         security import certificate.p12 -P $MACOS_CERTIFICATE_PWD -A -t cert -f pkcs12 -k build.keychain -T /usr/bin/codesign
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAINPWD" build.keychain
+        cd bin/
         find . -iname '*' -exec /usr/bin/codesign --force --options runtime --sign "Developer ID Application" {} -v \;
 
     # upload artifacts (action)
