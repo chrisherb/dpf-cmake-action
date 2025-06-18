@@ -629,7 +629,16 @@ runs:
         security import certificate.p12 -P $MACOS_CERTIFICATE_PWD -A -t cert -f pkcs12 -k build.keychain -T /usr/bin/codesign
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAINPWD" build.keychain
         cd bin/
-        find . -iname '*' -exec /usr/bin/codesign --force --options runtime --timestamp --sign "Developer ID Application" {} -v \;
+        for plugin in *.clap *.vst *.vst3 *.component; do
+          if [ -d "$plugin/Contents/MacOS" ]; then
+            for binfile in "$plugin"/Contents/MacOS/*; do
+              if file "$binfile" | grep -q 'Mach-O'; then
+                /usr/bin/codesign --force --options runtime --timestamp --sign "Developer ID Application" "$binfile" -v
+              fi
+            done
+            /usr/bin/codesign --force --deep --options runtime --timestamp --sign "Developer ID Application" "$plugin" -v
+          fi
+        done
 
     # upload artifacts (action)
     - name: Upload artifacts (Linux)
