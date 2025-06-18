@@ -621,6 +621,7 @@ runs:
         KEYCHAINPWD: temporarykeychainpassword
       shell: bash
       run: |
+        security delete-keychain build.keychain 2>/dev/null || true
         security create-keychain -p "$KEYCHAINPWD" build.keychain
         security default-keychain -s build.keychain
         security unlock-keychain -p "$KEYCHAINPWD" build.keychain
