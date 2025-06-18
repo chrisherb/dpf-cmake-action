@@ -211,7 +211,9 @@ runs:
       if: ${{ startsWith(inputs.target, 'macos') }}
       shell: bash
       run: |
-        brew uninstall --ignore-dependencies cairo || true
+        if brew list --formula | grep -q '^cairo$'; then
+          brew uninstall --ignore-dependencies cairo
+        fi
     - name: Setup dependencies (win32)
       if: ${{ inputs.target == 'win32' }}
       shell: bash
