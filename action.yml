@@ -226,7 +226,7 @@ runs:
       run: |
         ${SUDO} dpkg --add-architecture i386
         ${SUDO} apt-get update -qq
-        ${SUDO} apt-get install -yqq --allow-downgrades binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 gperf wine-stable xvfb
+        ${SUDO} apt-get install -yqq --allow-downgrades binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 gperf wine-stable wine64 wine32 xvfb
         ${SUDO} apt-get clean
     - name: Setup dependencies (pluginval)
       if: ${{ inputs.target == 'pluginval' || inputs.target == 'plugin-validation' }}
