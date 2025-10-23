@@ -79,7 +79,7 @@ runs:
         echo "HVCC_COMMIT_HASH=${HVCC_COMMIT_HASH:=44708e75e2f7ddfcf4b6629b3693bcb6e0bd5358}" >> $GITHUB_ENV
         echo "LIBGL_ALWAYS_SOFTWARE=true" >> $GITHUB_ENV
         echo "PAWPAW_CACHE_VERSION=${PAWPAW_CACHE_VERSION:=1}" >> $GITHUB_ENV
-        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=f6eaed13bdeccec013d81ba2261f98aa8f452702}" >> $GITHUB_ENV
+        echo "PAWPAW_COMMIT_HASH=${PAWPAW_COMMIT_HASH:=ff037e1133f9f0a54579d7dca75f402ea9fec95d}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_GLIB=${PAWPAW_SKIP_GLIB:=1}" >> $GITHUB_ENV
         echo "PAWPAW_SKIP_LV2=${PAWPAW_SKIP_LV2:=1}" >> $GITHUB_ENV
         [ "$(id -u)" -ne 0 ] && [ -e /usr/bin/sudo ] && echo "SUDO=/usr/bin/sudo" >> $GITHUB_ENV || true
@@ -211,9 +211,8 @@ runs:
       if: ${{ startsWith(inputs.target, 'macos') }}
       shell: bash
       run: |
-        if brew list --formula | grep -q '^cairo$'; then
-          brew uninstall --ignore-dependencies cairo
-        fi
+        brew uninstall --ignore-dependencies -f cairo
+        ${{ inputs.pawpaw == 'true' }} && brew uninstall --ignore-dependencies -f cmake || true
     - name: Setup dependencies (win32)
       if: ${{ inputs.target == 'win32' }}
       shell: bash
@@ -241,7 +240,7 @@ runs:
         # build-deps
         ${SUDO} apt-get install -yqq libasound2-dev libdbus-1-dev libgl1-mesa-dev libglib2.0-dev liblo-dev libpulse-dev libx11-dev libxcursor-dev libxext-dev libxrandr-dev gperf
         # runtime testing
-        ${SUDO} apt-get install -yqq carla-git ladspa-sdk lilv-utils lv2-dev lv2lint kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
+        ${SUDO} apt-get install -yqq carla-git ladspa-sdk lilv-utils lv2-dev lv2lint darkglass-lv2-extensions kxstudio-lv2-extensions mod-lv2-extensions valgrind xvfb
         # cleanup
         ${SUDO} apt-get clean
 
@@ -278,7 +277,7 @@ runs:
       shell: bash
       run: |
         python3 -m pip install --no-input \
-            git+https://github.com/Wasted-Audio/hvcc.git#${{ env.HVCC_COMMIT_HASH }}
+            git+https://github.com/Wasted-Audio/hvcc.git@${{ env.HVCC_COMMIT_HASH }}
 
     # build dependencies
     - name: Build dependencies through PawPaw
